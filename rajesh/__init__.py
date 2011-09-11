@@ -16,6 +16,16 @@ class JavaScript(object):
             self._command = name
         return self
 
+    def __setattr__(self, name, value):
+        if name.startswith("_"):
+            self.__dict__[name] = value
+        else:
+            if self._command:
+                self._write("%s.%s = %s" % (self._command, name, repr(value)))
+            else:
+                self._write("%s = %s" % (name, repr(value)))
+            self._command = ""
+
     def __call__(self, *args):
         self._write("%s(%s)" % (self._command, ", ".join(map(repr, args))))
         self._command = ""
