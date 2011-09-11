@@ -1,13 +1,15 @@
+import new
 from twisted.internet import reactor
 from twisted.web.static import File
 from txWebSocket.websocket import WebSocketHandler, WebSocketSite
 
 
-class JavaScript(object):
+class JavaScriptCode(object):
 
     def __init__(self, write):
         self._write = write
         self._command = ""
+        self._events = {}
 
     def __getattr__(self, name):
         if self._command:
@@ -21,9 +23,17 @@ class JavaScript(object):
             self.__dict__[name] = value
         else:
             if self._command:
-                self._write("%s.%s = %s" % (self._command, name, repr(value)))
+                self._command += "."
+            self._command += name
+            if type(value) is new.instancemethod:
+                function_name = value.__name__
+                self._events[function_name] = value
+                function = Function()
+                function.sock.send(function_name)
+                self._command += " = %s" % repr(function)
             else:
-                self._write("%s = %s" % (name, repr(value)))
+                self._command += " = %s" % repr(value)
+            self._write(self._command)
             self._command = ""
 
     def __call__(self, *args):
@@ -31,11 +41,29 @@ class JavaScript(object):
         self._command = ""
 
 
+class Function(JavaScriptCode):
+
+    def __init__(self):
+        self._command = ""
+        self._lines = []
+
+    def __repr__(self):
+        return "function() { %s }" % "; ".join(self._lines)
+
+    def _write(self, command):
+        self._lines.append(command)
+
+
 class Application(WebSocketHandler):
 
     def connectionMade(self):
-        self.js = JavaScript(self.transport.write)
+        self.js = JavaScriptCode(self.transport.write)
         self.begin()
+
+    def frameReceived(self, message):
+        method = self.js._events.get(message, None)
+        if callable(method):
+            method()
 
 
 class ApplicationError(Exception):
