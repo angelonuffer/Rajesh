@@ -65,6 +65,13 @@ class Application(WebSocketHandler):
         if callable(method):
             method()
 
+    def put(self, element, (x, y)):
+        self.js.document.write(repr(element))
+        element_id = element.parameters["id"]
+        getattr(self.js, element_id).style.setProperty("position", "absolute")
+        getattr(self.js, element_id).style.setProperty("top", x)
+        getattr(self.js, element_id).style.setProperty("left", y)
+
 
 class ApplicationError(Exception):
     pass
