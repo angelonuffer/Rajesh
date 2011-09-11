@@ -1,3 +1,3 @@
-[submodule "txWebSocket"]
-	path = txWebSocket
+[submodule "rajesh/txWebSocket"]
+	path = rajesh/txWebSocket
 	url = git@github.com:rlotun/txWebSocket
