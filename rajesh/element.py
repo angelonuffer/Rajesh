@@ -16,3 +16,9 @@ class Button(Element):
 
     def __init__(self, **kwargs):
         super(Button, self).__init__("button", **kwargs)
+
+
+class Img(Element):
+
+    def __init__(self, **kwargs):
+        super(Img, self).__init__("img", **kwargs)
