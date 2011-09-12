@@ -69,13 +69,22 @@ class Application(WebSocketHandler):
         self.js.document.write(repr(element))
         element_id = element.parameters["id"]
         getattr(self.js, element_id).style.setProperty("position", "absolute")
-        getattr(self.js, element_id).style.setProperty("top", x)
-        getattr(self.js, element_id).style.setProperty("left", y)
+        getattr(self.js, element_id).style.setProperty("top", y)
+        getattr(self.js, element_id).style.setProperty("left", x)
+
+
+class Expression(str):
+
+    def __repr__(self):
+        return self
 
 
 class ApplicationError(Exception):
     pass
 
+
+def expr(expression):
+    return Expression(expression)
 
 def run(port=8080):
     applications = Application.__subclasses__()
