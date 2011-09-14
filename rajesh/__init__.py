@@ -71,6 +71,7 @@ class Application(WebSocketHandler):
         getattr(self.js, element_id).style.setProperty("position", "absolute")
         getattr(self.js, element_id).style.setProperty("top", y)
         getattr(self.js, element_id).style.setProperty("left", x)
+        element.on_put()
 
 
 class Expression(str):

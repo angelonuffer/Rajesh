@@ -11,6 +11,9 @@ class Element(object):
         text = self.text
         return "<%(name)s %(parameters)s>%(text)s</%(name)s>" % locals()
 
+    def on_put(self):
+        pass
+
 
 class Button(Element):
 
