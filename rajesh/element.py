@@ -22,3 +22,12 @@ class Img(Element):
 
     def __init__(self, **kwargs):
         super(Img, self).__init__("img", **kwargs)
+
+
+class Div(Element):
+
+    def __init__(self, **kwargs):
+        super(Div, self).__init__("div", **kwargs)
+
+    def put(self, element):
+        self.text += repr(element)
