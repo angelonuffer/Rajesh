@@ -34,3 +34,9 @@ class Div(Element):
 
     def put(self, element):
         self.text += repr(element)
+
+
+class Input(Element):
+
+    def __init__(self, **kwargs):
+        super(Input, self).__init__("input", **kwargs)
