@@ -61,9 +61,12 @@ class Application(WebSocketHandler):
         self.begin()
 
     def frameReceived(self, message):
-        method = self.js._events.get(message, None)
+        words = message.split(" ")
+        method_name = words[0]
+        parameters = words[1:] if len(words) > 1 else []
+        method = self.js._events.get(method_name, None)
         if callable(method):
-            method()
+            method(*parameters)
 
     def put(self, element, (x, y)):
         self.js.document.write(repr(element))
