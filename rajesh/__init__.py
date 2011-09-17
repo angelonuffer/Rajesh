@@ -58,7 +58,17 @@ class Application(WebSocketHandler):
 
     def connectionMade(self):
         self.js = JavaScriptCode(self.transport.write)
+        self._title = ""
         self.begin()
+
+    @property
+    def title(self):
+        return self._title
+
+    @title.setter
+    def title(self, value):
+        self._title = value
+        self.js.document.title = value
 
     def frameReceived(self, message):
         words = message.split(" ")
