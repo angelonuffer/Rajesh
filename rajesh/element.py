@@ -15,6 +15,12 @@ class Element(object):
         pass
 
 
+class Body(Element):
+
+    def __init__(self, **kwargs):
+        super(Body, self).__init__("body", **kwargs)
+
+
 class Button(Element):
 
     def __init__(self, **kwargs):

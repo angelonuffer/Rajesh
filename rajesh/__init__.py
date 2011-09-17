@@ -2,6 +2,7 @@ import new
 from twisted.internet import reactor
 from twisted.web.static import File
 from txWebSocket.websocket import WebSocketHandler, WebSocketSite
+from widget import Document
 
 
 class JavaScriptCode(object):
@@ -59,6 +60,7 @@ class Application(WebSocketHandler):
     def connectionMade(self):
         self.js = JavaScriptCode(self.transport.write)
         self._title = ""
+        self.document = Document(self)
         self.begin()
 
     @property
@@ -69,6 +71,14 @@ class Application(WebSocketHandler):
     def title(self, value):
         self._title = value
         self.js.document.title = value
+
+    @property
+    def background(self):
+        return self.document.background
+
+    @background.setter
+    def background(self, value):
+        self.document.background = value
 
     def frameReceived(self, message):
         words = message.split(" ")
