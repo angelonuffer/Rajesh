@@ -80,6 +80,9 @@ class Application(WebSocketHandler):
     def background(self, value):
         self.document.background = value
 
+    def new_box(self, id, position):
+        self.document.new_box(id, position)
+
     def frameReceived(self, message):
         words = message.split(" ")
         method_name = words[0]
