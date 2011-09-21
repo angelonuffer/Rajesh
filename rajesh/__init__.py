@@ -1,3 +1,4 @@
+import os
 import new
 from twisted.internet import reactor
 from twisted.web.static import File
@@ -113,8 +114,9 @@ class ApplicationError(Exception):
 def expr(expression):
     return Expression(expression)
 
-def run(port=8080):
-    applications = Application.__subclasses__()
+def run(port=8080, applications=None):
+    if applications is None:
+        applications = Application.__subclasses__()
     if len(applications) != 1:
         raise ApplicationError("You may have only one application")
     root = File(".")
