@@ -3,7 +3,7 @@ import new
 from twisted.internet import reactor
 from twisted.web.static import File
 from txWebSocket.websocket import WebSocketHandler, WebSocketSite
-from widget import Document
+from widget import Document, Image
 
 
 class JavaScriptCode(object):
@@ -81,8 +81,13 @@ class Application(WebSocketHandler):
     def background(self, value):
         self.document.background = value
 
-    def new_box(self, id, position):
-        self.document.new_box(id, position)
+    def new_box(self, id, **kwargs):
+        return self.document.new_box(id, **kwargs)
+
+    def new_image(self, id, path, **kwargs):
+        image = Image(self, path, id=id, **kwargs)
+        self.document.append_child(image)
+        return image
 
     def frameReceived(self, message):
         words = message.split(" ")

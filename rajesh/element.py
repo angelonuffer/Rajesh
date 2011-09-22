@@ -46,3 +46,9 @@ class Input(Element):
 
     def __init__(self, **kwargs):
         super(Input, self).__init__("input", **kwargs)
+
+
+class P(Element):
+
+    def __init__(self, **kwargs):
+        super(P, self).__init__("p", **kwargs)
