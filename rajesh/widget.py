@@ -1,3 +1,4 @@
+import new
 from element import Img, Div, P
 from element import Button as ButtonElement
 
@@ -10,6 +11,13 @@ class Widget(object):
         self.element = element
         self.element.parameters["id"] = id
         self.children = []
+
+    def __getitem__(self, key):
+        return self.element.parameters[key]
+
+    def __setitem__(self, key, value):
+        self.js.setAttribute(key, value)
+        self.element.parameters[key] = value
 
     @property
     def js(self):
@@ -26,7 +34,9 @@ class Widget(object):
         self.js.style.setProperty("left", x)
 
     def on_put(self):
-        pass
+        for parameter, value in self.element.parameters.items():
+            if type(value) is new.instancemethod:
+                setattr(self.js, parameter, value)
 
 
 class Document(Widget):
@@ -58,6 +68,7 @@ class Background(Image):
         super(Background, self).__init__(app, "background", path, width="100%", height="100%", **kwargs)
 
     def on_put(self):
+        super(Background, self).on_put()
         self.set_position(0, 0)
 
 
@@ -87,8 +98,6 @@ class Text(Widget):
 class Button(Widget):
 
     def __init__(self, app, id, text, **kwargs):
-        super(Button, self).__init__(app, id, ButtonElement(**kwargs))
-        self._text = text
-
-    def on_put(self):
-        self.js.innerHTML = self._text
+        element = ButtonElement(**kwargs)
+        element.text = text
+        super(Button, self).__init__(app, id, element)
