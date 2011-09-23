@@ -1,21 +1,37 @@
 from element import Img, Div, P
+from element import Button as ButtonElement
 
 
 class Widget(object):
 
-    def __init__(self, app, element, position):
+    def __init__(self, app, id, element):
         self.app = app
+        self.id = id
         self.element = element
-        self.position = position
+        self.element.parameters["id"] = id
+        self.children = []
 
     @property
     def js(self):
-        return getattr(self.app.js, self.element.parameters["id"])
+        return getattr(self.app.js, self.id)
+
+    def append_child(self, widget):
+        self.children.append(widget)
+        self.app.put(widget.element)
+        widget.on_put()
+
+    def set_position(self, x, y):
+        self.js.style.setProperty("position", "absolute")
+        self.js.style.setProperty("top", y)
+        self.js.style.setProperty("left", x)
+
+    def on_put(self):
+        pass
 
 
-class Document(object):
+class Document(Widget):
 
-    def __init__(self, app, **kwargs):
+    def __init__(self, app):
         self.app = app
         self._background = ""
         self.children = []
@@ -29,47 +45,32 @@ class Document(object):
         self._background = Background(self.app, value)
         self.append_child(self._background)
 
-    def new_box(self, id, **kwargs):
-        box = Box(self.app, id=id, **kwargs)
-        self.append_child(box)
-        return box
-
-    def append_child(self, widget):
-        self.children.append(widget)
-        self.app.put(widget.element, widget.position)
-
 
 class Image(Widget):
 
-    def __init__(self, app, path, position=(0, 0), **kwargs):
-        super(Image, self).__init__(app, Img(src=path, **kwargs), position)
+    def __init__(self, app, id, path, **kwargs):
+        super(Image, self).__init__(app, id, Img(src=path, **kwargs))
 
 
 class Background(Image):
 
     def __init__(self, app, path, **kwargs):
-        super(Background, self).__init__(app, path, id="background", width="100%", height="100%", **kwargs)
+        super(Background, self).__init__(app, "background", path, width="100%", height="100%", **kwargs)
+
+    def on_put(self):
+        self.set_position(0, 0)
 
 
 class Box(Widget):
 
-    def __init__(self, app, position=(0, 0), **kwargs):
-        super(Box, self).__init__(app, Div(**kwargs), position)
-        self.children = []
-
-    @property
-    def inner_html(self):
-        "\n".join([repr(widget.element) for widget in self.children])
-
-    def append_child(self, widget):
-        self.children.append(widget)
-        self.js.innerHTML = self.inner_html
+    def __init__(self, app, id, **kwargs):
+        super(Box, self).__init__(app, id, Div(**kwargs))
 
 
 class Text(Widget):
 
-    def __init__(self, app, id, value, position=(0, 0), **kwargs):
-        super(Text, self).__init__(app, P(id=id, **kwargs), position)
+    def __init__(self, app, id, value, **kwargs):
+        super(Text, self).__init__(app, id, P(**kwargs))
         self._value = value
         self.element.text = value
 
@@ -81,3 +82,13 @@ class Text(Widget):
     def value(self, value):
         self.js.innerHTML = value
         self._value = value
+
+
+class Button(Widget):
+
+    def __init__(self, app, id, text, **kwargs):
+        super(Button, self).__init__(app, id, ButtonElement(**kwargs))
+        self._text = text
+
+    def on_put(self):
+        self.js.innerHTML = self._text

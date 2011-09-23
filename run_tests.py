@@ -19,7 +19,7 @@ def stop_rajesh():
 def load_tests(loader, tests, ignore):
     global browser
     browser = Browser("chrome")
-    browser.wait_time = 10
+    browser.wait_time = 1
     for test_path in filter(lambda path: path.endswith(".rst"), os.listdir("docs")):
         tests.addTests(doctest.DocFileSuite(os.path.join("docs", test_path),
                                             globs={

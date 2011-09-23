@@ -26,3 +26,21 @@ You can run javascript code in widgets with js attribute::
     >>> browser.is_text_present("text in a box")
     True
     >>> stop_rajesh()
+
+You can set python methods to javascript events::
+
+    >>> class MyApplication(rajesh.Application):
+    ...     def begin(self):
+    ...         button = self.new_button("button1", "click me")
+    ...         button.js.onclick = self.on_click
+    ...     def on_click(self):
+    ...         self.js.document.write("button clicked")
+
+    >>> start_rajesh([MyApplication])
+    >>> browser.visit("http://localhost:8080")
+    >>> browser.is_text_not_present("button clicked")
+    True
+    >>> browser.find_by_id("button1").first.click()
+    >>> browser.is_text_present("button clicked")
+    True
+    >>> stop_rajesh()
