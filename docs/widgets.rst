@@ -62,3 +62,17 @@ You can set html parameters in widget::
     >>> browser.is_element_present_by_css("button[class=button_class]")
     True
     >>> stop_rajesh()
+
+You can set a css property::
+
+    >>> class MyApplication(rajesh.Application):
+    ...     def begin(self):
+    ...         button = self.new_button("green_button", "green button")
+    ...         button.css.background = "green"
+
+    >>> start_rajesh([MyApplication])
+    >>> browser.visit("http://localhost:8080")
+    >>> button = browser.find_by_id("green_button").first
+    >>> button._element.value_of_css_property("background")
+    u'green'
+    >>> stop_rajesh()

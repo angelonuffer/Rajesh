@@ -3,14 +3,27 @@ from element import Img, Div, P
 from element import Button as ButtonElement
 
 
+class CSSSheet(object):
+
+    def __init__(self, widget):
+        self._widget = widget
+
+    def __setattr__(self, property_, value):
+        if property_.startswith("_"):
+            self.__dict__[property_] = value
+        else:
+            self._widget.js.style.setProperty(property_, value)
+
+
 class Widget(object):
 
-    def __init__(self, app, id, element):
+    def __init__(self, app, id_, element):
         self.app = app
-        self.id = id
+        self.id_ = id_
         self.element = element
-        self.element.parameters["id"] = id
+        self.element.parameters["id"] = id_
         self.children = []
+        self.css = CSSSheet(self)
 
     def __getitem__(self, key):
         return self.element.parameters[key]
@@ -21,7 +34,7 @@ class Widget(object):
 
     @property
     def js(self):
-        return getattr(self.app.js, self.id)
+        return getattr(self.app.js, self.id_)
 
     def append_child(self, widget):
         self.children.append(widget)
@@ -58,8 +71,8 @@ class Document(Widget):
 
 class Image(Widget):
 
-    def __init__(self, app, id, path, **kwargs):
-        super(Image, self).__init__(app, id, Img(src=path, **kwargs))
+    def __init__(self, app, id_, path, **kwargs):
+        super(Image, self).__init__(app, id_, Img(src=path, **kwargs))
 
 
 class Background(Image):
@@ -74,14 +87,14 @@ class Background(Image):
 
 class Box(Widget):
 
-    def __init__(self, app, id, **kwargs):
-        super(Box, self).__init__(app, id, Div(**kwargs))
+    def __init__(self, app, id_, **kwargs):
+        super(Box, self).__init__(app, id_, Div(**kwargs))
 
 
 class Text(Widget):
 
-    def __init__(self, app, id, value, **kwargs):
-        super(Text, self).__init__(app, id, P(**kwargs))
+    def __init__(self, app, id_, value, **kwargs):
+        super(Text, self).__init__(app, id_, P(**kwargs))
         self._value = value
         self.element.text = value
 
@@ -97,7 +110,7 @@ class Text(Widget):
 
 class Button(Widget):
 
-    def __init__(self, app, id, text, **kwargs):
+    def __init__(self, app, id_, text, **kwargs):
         element = ButtonElement(**kwargs)
         element.text = text
-        super(Button, self).__init__(app, id, element)
+        super(Button, self).__init__(app, id_, element)
