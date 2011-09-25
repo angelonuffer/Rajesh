@@ -38,8 +38,7 @@ class Widget(object):
 
     def append_child(self, widget):
         self.children.append(widget)
-        self.app.put(widget.element)
-        widget.on_put()
+        self.app.put(self, widget)
 
     def set_position(self, x, y):
         self.js.style.setProperty("position", "absolute")

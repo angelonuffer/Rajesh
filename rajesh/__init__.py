@@ -35,10 +35,12 @@ class JavaScriptCode(object):
                 self._command += " = %s" % repr(function)
             else:
                 self._command += " = %s" % repr(value)
+            print self._command
             self._write(self._command)
             self._command = ""
 
     def __call__(self, *args):
+        print "%s(%s)" % (self._command, ", ".join(map(repr, args)))
         self._write("%s(%s)" % (self._command, ", ".join(map(repr, args))))
         self._command = ""
 
@@ -104,8 +106,12 @@ class Application(WebSocketHandler):
         if callable(method):
             method(*parameters)
 
-    def put(self, element):
-        self.js.document.write(repr(element))
+    def put(self, parent, widget):
+        if parent is self.document:
+            self.js.document.write(repr(widget.element))
+        else:
+            parent.js.innerHTML = expr("%s.innerHTML + '%s'" % (parent.id_, repr(widget.element)))
+        widget.on_put()
 
 
 class Expression(str):
