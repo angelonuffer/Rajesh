@@ -1,10 +1,12 @@
 import os
 import new
+import socket
 from twisted.internet import reactor
 from twisted.web.static import File
 from txWebSocket.websocket import WebSocketHandler, WebSocketSite
 from widget import Document, Image, Button, Box
 from site import Site
+from handler import File, WebSocketHandler
 
 
 class JavaScriptCode(object):
@@ -128,8 +130,13 @@ def run(port=8080, applications=None):
     if len(applications) != 1:
         raise ApplicationError("You may have only one application")
     site = Site(port)
-    site.handlers["/application_handler"] = applications[0]
-    try:
-        site.run()
-    except KeyboardInterrupt:
-        site.sock.close()
+    site.handlers["/"] = File("index.html")
+    site.handlers["/rajesh.js"] = File("rajesh.js")
+    site.handlers["/application_handler"] = applications[0]()
+    while not site.running:
+        try:
+            site.run()
+        except KeyboardInterrupt:
+            site.sock.close()
+        except socket.error:
+            pass
