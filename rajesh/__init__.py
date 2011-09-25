@@ -61,11 +61,19 @@ class Function(JavaScriptCode):
 
 class Application(WebSocketHandler):
 
-    def connectionMade(self):
-        self.js = JavaScriptCode(self.transport.write)
+    def connection_made(self):
+        self.js = JavaScriptCode(self.write)
         self._title = ""
         self.document = Document(self)
         self.begin()
+
+    def message_received(self, message):
+        words = message.split(" ")
+        method_name = words[0]
+        parameters = words[1:] if len(words) > 1 else []
+        method = self.js._events.get(method_name, None)
+        if callable(method):
+            method(*parameters)
 
     @property
     def title(self):
@@ -98,14 +106,6 @@ class Application(WebSocketHandler):
         button = Button(self, id, text, **kwargs)
         self.document.append_child(button)
         return button
-
-    def frameReceived(self, message):
-        words = message.split(" ")
-        method_name = words[0]
-        parameters = words[1:] if len(words) > 1 else []
-        method = self.js._events.get(method_name, None)
-        if callable(method):
-            method(*parameters)
 
     def put(self, element):
         self.js.document.write(repr(element))

@@ -9,8 +9,9 @@ class Request(object):
         self.method = first_line.split(" ")[0]
         self.path = first_line.split(" ")[1]
         self.http_version = first_line.split(" ")[2]
+        header, self.body = data.split("\r\n\r\n")
         self.header = {}
-        for line in data.split("\r\n")[1:]:
+        for line in header.split("\r\n")[1:]:
             if ": " in line:
                 key, value = line.split(": ")
                 self.header[key] = value
