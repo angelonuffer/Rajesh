@@ -4,6 +4,7 @@ from twisted.internet import reactor
 from twisted.web.static import File
 from txWebSocket.websocket import WebSocketHandler, WebSocketSite
 from widget import Document, Image, Button, Box
+from site import Site
 
 
 class JavaScriptCode(object):
@@ -126,8 +127,9 @@ def run(port=8080, applications=None):
         applications = Application.__subclasses__()
     if len(applications) != 1:
         raise ApplicationError("You may have only one application")
-    root = File(".")
-    site = WebSocketSite(root)
-    site.addHandler("/application_handler", applications[0])
-    reactor.listenTCP(port, site)
-    reactor.run()
+    site = Site(port)
+    site.handlers["/application_handler"] = applications[0]
+    try:
+        site.run()
+    except KeyboardInterrupt:
+        site.sock.close()
